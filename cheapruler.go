@@ -1,16 +1,14 @@
 package cheapruler
 
 import (
-	"errors"
 	"math"
 )
 
 // A collection of very fast approximations to common geodesic measurements.
 // Useful for performance-sensitive code that measures things on a city scale.
 type CheapRuler struct {
-	Kx      float64
-	Ky      float64
-	Factors map[string]float64
+	Kx float64
+	Ky float64
 }
 
 // The closest point on the line from the given point and
@@ -22,50 +20,25 @@ type PointOnLine struct {
 }
 
 // Create a new cheap ruler instance
-func NewCheapruler(lat float64, units string) (CheapRuler, error) {
-
+func NewCheapruler(lat float64, m Unit) (CheapRuler, error) {
 	cr := CheapRuler{}
 
-	// Multipliers for converting between units.
-	factors := map[string]float64{
-		"kilometers":    1,
-		"kilometres":    1,
-		"miles":         1000 / 1609.344,
-		"nauticalmiles": 1000 / 1852,
-		"meters":        1000,
-		"metres":        1000,
-		"yards":         1000 / 0.9144,
-		"feet":          1000 / 0.3048,
-		"inches":        1000 / 0.0254,
-	}
+	cos := math.Cos(lat * math.Pi / 180)
+	cos2 := 2*cos*cos - 1
+	cos3 := 2*cos*cos2 - cos
+	cos4 := 2*cos*cos3 - cos2
+	cos5 := 2*cos*cos4 - cos3
 
-	if m, ok := factors[units]; ok {
+	// multipliers for converting longitude and latitude degrees into distance
+	// (http://1.usa.gov/1Wb1bv7)
+	cr.Kx = float64(m) * (111.41513*cos - 0.09455*cos3 + 0.00012*cos5)
+	cr.Ky = float64(m) * (111.13209 - 0.56605*cos2 + 0.0012*cos4)
 
-		cos := math.Cos(lat * math.Pi / 180)
-		cos2 := 2*cos*cos - 1
-		cos3 := 2*cos*cos2 - cos
-		cos4 := 2*cos*cos3 - cos2
-		cos5 := 2*cos*cos4 - cos3
-
-		// multipliers for converting longitude and latitude degrees into distance
-		// (http://1.usa.gov/1Wb1bv7)
-		cr.Kx = m * (111.41513*cos - 0.09455*cos3 + 0.00012*cos5)
-		cr.Ky = m * (111.13209 - 0.56605*cos2 + 0.0012*cos4)
-		cr.Factors = factors
-
-		return cr, nil
-
-	} else {
-
-		err := errors.New(units + "is not a valid unit")
-		return cr, err
-
-	}
-
+	return cr, nil
 }
 
 // Creates a CheapRuler struct from tile coordinates (y and z). Convenient in tile-reduce scripts.
-func NewCheaprulerFromTile(y float64, z float64, units string) (CheapRuler, error) {
+func NewCheaprulerFromTile(y float64, z float64, units Unit) (CheapRuler, error) {
 	n := math.Pi * (1 - 2*(y+0.5)/math.Pow(2, z))
 	lat := math.Atan(0.5*(math.Exp(n)-math.Exp(-n))) * 180 / math.Pi
 	return NewCheapruler(lat, units)

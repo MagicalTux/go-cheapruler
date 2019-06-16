@@ -23,75 +23,29 @@ func assertErr(t *testing.T, actual float64, expected float64, maxErr float64, d
 func TestNewCheapruler(t *testing.T) {
 	t.Log("Check NewCheapruler constructor functions appropriately")
 
-	cr, err := NewCheapruler(1.0, "metres")
+	cr, err := NewCheapruler(1.0, Metres)
 
 	if err != nil {
 		t.Error(err)
 	}
 
 	t.Log("OK", cr)
-}
-
-func TestInvalidNewCheapruler(t *testing.T) {
-	t.Log("Check NewCheapruler constructor fails as expected")
-
-	_, err := NewCheapruler(1.0, "nonesense")
-
-	if err != nil {
-		t.Log("Errored as expected")
-	} else {
-		t.Error("Cheapruler constructor did not throw an error as expected for wrong units")
-	}
-}
-
-func TestCheaprulerHasMethods(t *testing.T) {
-	t.Log("Check NewCheapruler has all exported methods")
-
-	cr, err := NewCheapruler(1.0, "metres")
-
-	if err != nil {
-		t.Error(err)
-	}
-
-	t.Log("OK", cr.Along)
-	t.Log("OK", cr.Area)
-	t.Log("OK", cr.Bearing)
-	t.Log("OK", cr.BufferBBox)
-	t.Log("OK", cr.BufferPoint)
-	t.Log("OK", cr.Destination)
-	t.Log("OK", cr.Distance)
-	t.Log("OK", cr.InsideBBox)
-	t.Log("OK", cr.LineDistance)
-	t.Log("OK", cr.Factors)
-
 }
 
 func TestNewCheaprulerFromTile(t *testing.T) {
 	t.Log("Check NewCheaprulerFromTile works correctly")
 
-	cr, err := NewCheaprulerFromTile(1.0, 1.0, "metres")
+	cr, err := NewCheaprulerFromTile(1.0, 1.0, Metres)
 	if err != nil {
 		t.Error(err)
 	}
 	t.Log("OK", cr)
 }
 
-func TestInvalidNewCheaprulerFromTile(t *testing.T) {
-	t.Log("Check NewCheaprulerFromTile errors correctly")
-
-	_, err := NewCheaprulerFromTile(1.0, 1.0, "nonesense")
-
-	if err != nil {
-		t.Log("Errored as expected")
-	} else {
-		t.Error("Cheapruler constructor did not throw an error as expected for wrong units")
-	}
-}
-
 func TestDistanceKilometers(t *testing.T) {
 
 	t.Log("Check distance calculations are accurate in kilometers")
-	kilocr, _ := NewCheapruler(32.8351, "kilometers")
+	kilocr, _ := NewCheapruler(32.8351, Kilometers)
 
 	expected := kilocr.Distance([]float64{-96.920341, 32.838261}, []float64{-96.920421, 32.838295})
 	actual := 0.008385790760648736
@@ -101,7 +55,7 @@ func TestDistanceKilometers(t *testing.T) {
 }
 
 func ExampleCheapRuler_Distance() {
-	cr, _ := NewCheapruler(32.8351, "kilometers")
+	cr, _ := NewCheapruler(32.8351, Kilometers)
 	pointA := []float64{-96.920341, 32.838261}
 	pointB := []float64{-96.920421, 32.838295}
 	dist := cr.Distance(pointA, pointB)
@@ -112,8 +66,8 @@ func ExampleCheapRuler_Distance() {
 func TestDistanceMiles(t *testing.T) {
 
 	t.Log("Check distance calculations are accurate in miles")
-	milescr, _ := NewCheapruler(32.8351, "miles")
-	kilocr, _ := NewCheapruler(32.8351, "kilometers")
+	milescr, _ := NewCheapruler(32.8351, Miles)
+	kilocr, _ := NewCheapruler(32.8351, Kilometers)
 
 	d := kilocr.Distance([]float64{30.5, 32.8351}, []float64{30.51, 32.8451})
 	d2 := milescr.Distance([]float64{30.5, 32.8351}, []float64{30.51, 32.8451})
@@ -125,7 +79,7 @@ func TestDistanceMiles(t *testing.T) {
 func TestBearing(t *testing.T) {
 
 	t.Log("Check bearing calculations are accurate in miles")
-	kilocr, _ := NewCheapruler(32.8351, "kilometers")
+	kilocr, _ := NewCheapruler(32.8351, Kilometers)
 	actual := kilocr.Bearing([]float64{-96.920341, 32.838261}, []float64{-96.920421, 32.838295})
 	expected := -63.279807556490866
 
@@ -136,7 +90,7 @@ func TestBearing(t *testing.T) {
 func TestBearingZero(t *testing.T) {
 	t.Log("Test when bearing is zero")
 
-	kilocr, _ := NewCheapruler(30, "kilometers")
+	kilocr, _ := NewCheapruler(30, Kilometers)
 	actual := kilocr.Bearing([]float64{10, 10}, []float64{10, 10})
 	expected := 0.0
 	assertErr(t, actual, expected, 0.005, "zero bearing")
@@ -144,7 +98,7 @@ func TestBearingZero(t *testing.T) {
 
 func TestDestination(t *testing.T) {
 	t.Log("Test destination function")
-	kilocr, _ := NewCheapruler(0, "kilometers")
+	kilocr, _ := NewCheapruler(0, Kilometers)
 	actual := kilocr.Destination([]float64{0, 0}, 10000, 0)
 	expected := []float64{0.000000000000005500534937111209, 90.44270255818994}
 	assertErr(t, actual[0], expected[0], 0.005, "destination x")
@@ -153,7 +107,7 @@ func TestDestination(t *testing.T) {
 
 func TestLineDistance(t *testing.T) {
 	t.Log("Test LineDistance function")
-	kilocr, _ := NewCheapruler(0, "kilometers")
+	kilocr, _ := NewCheapruler(0, Kilometers)
 	point1 := []float64{0, 0}
 	point2 := []float64{0, 50}
 	actual := kilocr.LineDistance([][]float64{point1, point2})
@@ -163,7 +117,7 @@ func TestLineDistance(t *testing.T) {
 
 func TestArea(t *testing.T) {
 	t.Log("Test Area function")
-	kilocr, _ := NewCheapruler(0, "kilometers")
+	kilocr, _ := NewCheapruler(0, Kilometers)
 	point1 := []float64{-67.031, 50.458}
 	point2 := []float64{-67.031, 50.534}
 	point3 := []float64{-66.929, 50.534}
@@ -178,7 +132,7 @@ func TestArea(t *testing.T) {
 
 func TestAlong(t *testing.T) {
 	t.Log("Along function")
-	kilocr, _ := NewCheapruler(0, "kilometers")
+	kilocr, _ := NewCheapruler(0, Kilometers)
 	point1 := []float64{0, 0}
 	point2 := []float64{0, 50}
 	actual := kilocr.Along([][]float64{point1, point2}, 25)
@@ -190,7 +144,7 @@ func TestAlong(t *testing.T) {
 
 func TestPointOnLine(t *testing.T) {
 	t.Log("Point on line function")
-	kilocr, _ := NewCheapruler(0, "kilometers")
+	kilocr, _ := NewCheapruler(0, Kilometers)
 	point1 := []float64{0, 0}
 	point2 := []float64{0, 50}
 	pointOnLine := []float64{0.5, 0.5}
@@ -201,7 +155,7 @@ func TestPointOnLine(t *testing.T) {
 
 func TestInsideBBox(t *testing.T) {
 	t.Log("InsideBBox function")
-	kilocr, _ := NewCheapruler(0, "kilometers")
+	kilocr, _ := NewCheapruler(0, Kilometers)
 	p := []float64{1, 1}
 	actual := kilocr.InsideBBox(p, []float64{0, 0, 2, 2})
 
@@ -213,7 +167,7 @@ func TestInsideBBox(t *testing.T) {
 
 func TestBufferPoint(t *testing.T) {
 	t.Log("Test buffer point function")
-	kilocr, _ := NewCheapruler(0, "kilometers")
+	kilocr, _ := NewCheapruler(0, Kilometers)
 	p := []float64{0, 0}
 	actual := kilocr.BufferPoint(p, 500)
 	// BufferPoint returns: []float64{w, s, e, n}
@@ -226,7 +180,7 @@ func TestBufferPoint(t *testing.T) {
 
 func TestBufferBbox(t *testing.T) {
 	t.Log("Test buffer bbox function")
-	kilocr, _ := NewCheapruler(0, "kilometers")
+	kilocr, _ := NewCheapruler(0, Kilometers)
 	bbox := []float64{30.5, 50.5, 31, 51}
 	actual := kilocr.BufferBBox(bbox, 0.2)
 	expected := []float64{30.498203388947427, 50.49819114594884, 31.001796611052573, 51.00180885405116}
@@ -238,7 +192,7 @@ func TestBufferBbox(t *testing.T) {
 
 func TestLineSlice(t *testing.T) {
 	t.Log("Test line slice function")
-	kilocr, _ := NewCheapruler(0, "kilometers")
+	kilocr, _ := NewCheapruler(0, Kilometers)
 	p1 := []float64{-67.04, 50.5}
 	p2 := []float64{-67.05, 50.56}
 	line := [][]float64{{-67.031, 50.458}, {-67.031, 50.534}, {-66.929, 50.534}, {-66.929, 50.458}}
@@ -254,7 +208,7 @@ func TestLineSlice(t *testing.T) {
 
 func TestLineSliceAlong(t *testing.T) {
 	t.Log("Test line slice along function")
-	kilocr, _ := NewCheapruler(0, "kilometers")
+	kilocr, _ := NewCheapruler(0, Kilometers)
 	line := [][]float64{{-67.031, 50.458}, {-67.031, 50.534}, {-66.929, 50.534}, {-66.929, 50.458}}
 	actual := kilocr.LineSliceAlong(10, 20, line)
 	p1 := []float64{-67.01665505103723, 50.534}
