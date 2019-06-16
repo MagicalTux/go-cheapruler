@@ -1,6 +1,6 @@
 # Cheapruler (Go)
 
-[![godoc reference](godoc.png)](https://godoc.org/github.com/JamesMilnerUK/cheapruler-go)
+[![godoc reference](godoc.png)](https://godoc.org/github.com/MagicalTux/go-cheapruler)
 
 "A collection of very fast approximations to common geodesic measurements. Useful for performance-sensitive code that measures things on a city scale.
 
@@ -27,7 +27,7 @@ fmt.Println(dist)
 
 ## Acknowledgements
 
-Based on [Vladimir Agafonkin](https://github.com/mourner)'s JavaScript library [cheapruler](https://github.com/mapbox/cheap-ruler)
+Based on [Vladimir Agafonkin](https://github.com/mourner)'s JavaScript library [cheapruler](https://github.com/mapbox/cheap-ruler). Forked from [James Milner's version](https://github.com/JamesMilnerUK/cheap-ruler-go).
 
 ## License 
 
