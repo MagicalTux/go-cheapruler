@@ -1,6 +1,7 @@
 package cheapruler
 
 import (
+	"errors"
 	"math"
 )
 
@@ -20,7 +21,7 @@ type PointOnLine struct {
 }
 
 // Create a new cheap ruler instance
-func NewCheapruler(lat float64, m Unit) (CheapRuler, error) {
+func New(lat float64, m Unit) CheapRuler {
 	cr := CheapRuler{}
 
 	cos := math.Cos(lat * math.Pi / 180)
@@ -34,14 +35,47 @@ func NewCheapruler(lat float64, m Unit) (CheapRuler, error) {
 	cr.Kx = float64(m) * (111.41513*cos - 0.09455*cos3 + 0.00012*cos5)
 	cr.Ky = float64(m) * (111.13209 - 0.56605*cos2 + 0.0012*cos4)
 
-	return cr, nil
+	return cr
+}
+
+// NewCheapruler returns a new cheapruler instance while keeping compatibility
+func NewCheapruler(lat float64, m string) (CheapRuler, error) {
+	var u Unit
+
+	switch m {
+	case "kilometers", "kilometres":
+		u = Kilometers
+	case "miles":
+		u = Miles
+	case "nauticalmiles":
+		u = Nauticalmiles
+	case "meters", "metres":
+		u = Meters
+	case "yards":
+		u = Yards
+	case "feet":
+		u = Feet
+	case "Inches":
+		u = Inches
+	default:
+		return CheapRuler{}, errors.New(m + "is not a valid unit")
+	}
+
+	return New(lat, u), nil
 }
 
 // Creates a CheapRuler struct from tile coordinates (y and z). Convenient in tile-reduce scripts.
-func NewCheaprulerFromTile(y float64, z float64, units Unit) (CheapRuler, error) {
+func NewFromTile(y float64, z float64, m Unit) CheapRuler {
 	n := math.Pi * (1 - 2*(y+0.5)/math.Pow(2, z))
 	lat := math.Atan(0.5*(math.Exp(n)-math.Exp(-n))) * 180 / math.Pi
-	return NewCheapruler(lat, units)
+	return New(lat, m)
+}
+
+// Creates a CheapRuler struct from tile coordinates (y and z). Convenient in tile-reduce scripts.
+func NewCheaprulerFromTile(y float64, z float64, m string) (CheapRuler, error) {
+	n := math.Pi * (1 - 2*(y+0.5)/math.Pow(2, z))
+	lat := math.Atan(0.5*(math.Exp(n)-math.Exp(-n))) * 180 / math.Pi
+	return NewCheapruler(lat, m)
 }
 
 // Given two points returns the distance in the units of the ruler

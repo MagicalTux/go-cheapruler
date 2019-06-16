@@ -16,7 +16,7 @@ Here  is an example of doing a distance measurement in kilometers, with a ruler 
 
 ```go
 
-cr, _ := NewCheapruler(32.8351, "kilometers")
+cr, _ := cheapruler.New(32.8351, cheapruler.Kilometers)
 pointA := []float64{-96.920341, 32.838261}
 pointB := []float64{-96.920421, 32.838295}
 dist := cr.Distance(pointA, pointB)
